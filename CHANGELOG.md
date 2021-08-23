@@ -20,5 +20,4 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Added PlayerShooting, PlayerController, and PlayerMovement to the "Player" namespace. 
 
 ### Removed
-
-## [0.3.0] - 2015-12-03
+- Nothing here.
