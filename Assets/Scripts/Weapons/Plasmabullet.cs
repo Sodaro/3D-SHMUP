@@ -1,3 +1,4 @@
+using Player;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,13 +12,16 @@ public class Plasmabullet : MonoBehaviour
 	private Action<int> _onHitCallback;
 	[SerializeField] private int _points = 5;
 
+	[SerializeField] private float _damage = 5;
+
+	enum OwnerType { Enemy, Player};
+	[SerializeField] OwnerType _owner;
+
 	public void Fire(Vector3 direction, Action<int> onHitCallBack)
 	{
 		_onHitCallback = onHitCallBack;
 		_rigidbody.AddForce(direction * _force, ForceMode.Impulse);
 	}
-
-	//TODO: handle collision with enemies
 
 	private void DestroyBullet(int points)
 	{
@@ -36,12 +40,35 @@ public class Plasmabullet : MonoBehaviour
 	}
 
 
-	private void OnCollisionEnter(Collision other)
+	private void OnTriggerEnter(Collider other)
 	{
-		Enemy enemy = other.gameObject.GetComponent<Enemy>();
-		if (ReferenceEquals(enemy, null))
-			DestroyBullet(0);
+		if (_owner == OwnerType.Player)
+		{
+			Enemy enemy = other.gameObject.GetComponent<Enemy>();
+			if (ReferenceEquals(enemy, null))
+			{
+				DestroyBullet(0);
+			}
+			else
+			{	
+				enemy.ReduceHealth(_damage);
+				DestroyBullet(enemy.Hit());
+			}
+				
+		}
 		else
-			DestroyBullet(enemy.Hit());
+		{
+			PlayerController player = other.GetComponent<PlayerController>();
+			if (ReferenceEquals(player, null))
+			{
+				Destroy(gameObject);
+			}
+			else
+			{
+				player.ReduceHealth(_damage);
+				Destroy(gameObject);
+			}
+				
+		}
 	}
 }

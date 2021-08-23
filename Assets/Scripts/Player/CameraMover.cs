@@ -9,11 +9,17 @@ public class CameraMover : MonoBehaviour
     int currentTargetIndex = 0;
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float rotationSpeed = 1f;
+    private Vector3 _velocity = Vector3.zero;
     // Start is called before the first frame update
     void Start()
     {
         currentTargetPoint = targetPoints[currentTargetIndex];
     }
+
+    public Vector3 GetVelocity()
+	{
+        return _velocity;
+	}
 
     // Update is called once per frame
     void Update()
@@ -31,6 +37,7 @@ public class CameraMover : MonoBehaviour
         Vector3 direction = (currentTargetPoint.position - transform.position).normalized;
         Quaternion lookRotation = Quaternion.LookRotation(direction);
         transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, rotationSpeed * Time.deltaTime);
-        transform.position += transform.forward * moveSpeed * Time.deltaTime;
+        _velocity = transform.forward * moveSpeed * Time.deltaTime;
+        transform.position += _velocity;
     }
 }

@@ -11,16 +11,17 @@ namespace Player
         private PlayerMovement _playerMovement;
         private PlayerShooting _playerShooting;
 
-        private float _currentHealth;
+        
         private int _totalPoints;
 
-        [SerializeField] private float _maxHealth;
+        [SerializeField] private float _maxHealth = 100;
+        private float _currentHealth;
 
-        
         [SerializeField] private IntEvent _totalPointsUpdated;
 
         private void Awake()
 	    {
+            _currentHealth = _maxHealth;
             _playerMovement = GetComponent<PlayerMovement>();
             _playerShooting = GetComponent<PlayerShooting>();
             
@@ -37,10 +38,21 @@ namespace Player
             _playerShooting?._onPointsAdded.AddListener(OnPointsAdded);
         }
 
-        // Update is called once per frame
-        void Update()
-        {
-        
+        public void ReduceHealth(float amount)
+		{
+            _currentHealth -= amount;
+            if (_currentHealth <= 0)
+                Destroy(gameObject);
         }
-    }
+
+		private void OnTriggerEnter(Collider other)
+		{
+            Collectible collectible = other.GetComponent<Collectible>();
+            if (ReferenceEquals(collectible, null))
+                return;
+            else
+                OnPointsAdded(collectible.PickUpCollectible());
+            Debug.Log("points added");
+        }
+	}
 }

@@ -7,12 +7,12 @@ namespace Player
     public class PlayerMovement : MonoBehaviour
     {
         [SerializeField] private bool _isRotationInverted = false;
-        [SerializeField] private float _rotationSpeed = 5f;
-        [SerializeField] private float _moveSpeed = 5f;
+        [SerializeField] private float _rotationSpeed = 60f;
+        [SerializeField] private float _moveSpeed = 10f;
 
 
-        private const float MAX_HORIZONTAL_ROTATION_DEG = 25f;
-        private const float MAX_VERTICAL_ROTATION_DEG = 25f;
+        private const float MAX_HORIZONTAL_ROTATION_DEG = 45f;
+        private const float MAX_VERTICAL_ROTATION_DEG = 45f;
 
         private const float PLAYER_MIN_X_POS = -6;
         private const float PLAYER_MAX_X_POS = 6;

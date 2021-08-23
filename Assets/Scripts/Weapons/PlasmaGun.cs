@@ -11,6 +11,7 @@ public class PlasmaGun : MonoBehaviour, IWeapon
 	private float _timeBetweenShots;
 	private float _timeOfLastShot;
 	private Coroutine _shootingRoutine;
+	private AudioSource _audio;
 
 	private Transform _transform;
 
@@ -54,11 +55,13 @@ public class PlasmaGun : MonoBehaviour, IWeapon
 	{
 		Vector3 direction = transform.forward;
 		Instantiate(_bulletPrefab, _transform.position, transform.rotation)?.GetComponent<Plasmabullet>()?.Fire(direction, onHitCallBack);
+		_audio.PlayOneShot(_audio.clip);
 	}
 
 	private void Awake()
 	{
 		_transform = transform;
 		_timeBetweenShots = SECONDS_PER_MINUTE / _roundsPerMinute;
+		_audio = GetComponent<AudioSource>();
 	}
 }

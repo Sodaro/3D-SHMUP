@@ -26,12 +26,13 @@ public class Spawner : MonoBehaviour
 
 		void CreateObject()
 		{
-
+			Vector3 spawnPosition = _transform.position;
+			spawnPosition.x += Random.Range(-3, 3);
+			spawnPosition.y += Random.Range(-3, 3);
+			spawnPosition.z += Random.Range(-3, 3);
 			GameObject go = _objectsToSpawn[Mathf.RoundToInt(_distribution.Evaluate(Random.value))];
-			Instantiate(go, _transform.position, Quaternion.Euler(0, Random.Range(0, 360f), 0));
+			Instantiate(go, spawnPosition, Quaternion.Euler(0, Random.Range(0, 360f), 0));
 		}
-
-		
 	}
 
 	private void OnEnable()
