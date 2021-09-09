@@ -1,0 +1,93 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEditor;
+using UnityEngine;
+
+[CustomEditor(typeof(DrawLine))]
+public class WaypointLineDrawer : Editor
+{
+    //private Transform[] _waypoints;
+
+    //void OnEnable()
+    //{
+    //    SceneView.duringSceneGui += this.OnSceneGUI;
+    //}
+
+    //void OnDisable()
+    //{
+    //    SceneView.duringSceneGui -= this.OnSceneGUI;
+    //}
+    public override void OnInspectorGUI()
+    {
+        //Called whenever the inspector is drawn for this object.
+        DrawDefaultInspector();
+        //This draws the default screen.  You don't need this if you want
+        //to start from scratch, but I use this when I'm just adding a button or
+        //some small addition and don't feel like recreating the whole inspector.
+        if (GUILayout.Button("Create New Waypoint"))
+        {
+            DrawLine t = target as DrawLine;
+            t.CreateNewWaypoint();
+            //add everthing the button would do.
+        }
+
+        if (GUILayout.Button("Waypoint LookAt Next"))
+        {
+            DrawLine t = target as DrawLine;
+            for (int i = 0; i < t.gameObjects.Count - 1; i++)
+            {
+                t.gameObjects[i].transform.LookAt(t.gameObjects[i + 1].transform);
+                //Handles.DrawBezier(p1, p2, p1, p2, Color.yellow, null, 12f);
+            }
+            //add everthing the button would do.
+        }
+    }
+
+
+
+    //Draw the approximate area the player can move within in the level
+    //Further development would use beziers and make the camera follow that line instead of drawing a line purely as debug
+
+    private void OnSceneGUI()
+    {
+        // get the chosen game object
+        DrawLine t = target as DrawLine;
+
+        if (t == null || t.gameObjects == null)
+            return;
+
+        int width = 12;
+        int height = 6;
+
+		for (int i = 0; i < t.gameObjects.Count-1; i++)
+		{
+            //matrix of current waypoint
+            Matrix4x4 firstMatrix = t.gameObjects[i].transform.localToWorldMatrix;
+
+            //matrix of next waypoint
+            Matrix4x4 secondMatrix = t.gameObjects[i+1].transform.localToWorldMatrix;
+
+            Matrix4x4 midMatrix = firstMatrix;
+
+            Vector3 firstPos = t.gameObjects[i].transform.position;
+            Vector3 secondPos = t.gameObjects[i+1].transform.position;
+
+
+
+            //set positions of mid matrix to be midpoint of the first two matrices
+            midMatrix[0, 3] = (firstPos.x + secondPos.x) / 2;
+            midMatrix[1, 3] = (firstPos.y + secondPos.y) / 2;
+            midMatrix[2, 3] = (firstPos.z + secondPos.z) / 2;
+
+            //set handle matrix to be the mid point matrix
+            Handles.matrix = midMatrix;
+
+            //positions from matrices
+            Vector3 p1 = new Vector3(firstMatrix[0, 3], firstMatrix[1, 3], firstMatrix[2, 3]);
+            Vector3 p2 = new Vector3(secondMatrix[0, 3], secondMatrix[1, 3], secondMatrix[2, 3]);
+
+            Handles.DrawWireCube(Vector3.zero, new Vector3(width, height, (p2 - p1).magnitude));
+		}
+
+	}
+}

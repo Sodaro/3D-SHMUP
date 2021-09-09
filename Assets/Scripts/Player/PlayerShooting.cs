@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using HelperClasses;
 
 namespace Player
 {
@@ -9,35 +10,54 @@ namespace Player
     {
         private IWeapon[] _weapons;
         private int _currentWeaponIndex = 0;
-        internal IntEvent _onPointsAdded;
+        //internal IntEvent _onPointsAdded;
+
+        [SerializeField] AudioClip _powerupSound;
+        AudioSource _audioSource;
+
+        private Dictionary<int, Coroutine> _modifierCoroutines;
+
+        public IEnumerator ActivateModifier(float value, float time, Enums.WeaponModifierType weaponModifier)
+		{
+
+            foreach (var weapon in _weapons)
+                weapon?.ApplyModifier(value, weaponModifier);
+
+            yield return new WaitForSeconds(time);
+
+            foreach (var weapon in _weapons)
+                weapon?.RemoveModifier(weaponModifier);
+        }
 
         public void StepWeapon(float direction) 
         {
-            if (_weapons[_currentWeaponIndex].IsShooting)
-		    {
-                _weapons[_currentWeaponIndex].StopShooting();
-		    }
-            if (direction > 0)
-                _currentWeaponIndex = (_currentWeaponIndex + 1) % _weapons.Length;
-            else
-                _currentWeaponIndex = (_currentWeaponIndex + _weapons.Length - 1) % _weapons.Length;
+      //      if (_weapons[_currentWeaponIndex].IsShooting)
+		    //{
+      //          _weapons[_currentWeaponIndex].StopShooting();
+		    //}
+      //      if (direction > 0)
+      //          _currentWeaponIndex = (_currentWeaponIndex + 1) % _weapons.Length;
+      //      else
+      //          _currentWeaponIndex = (_currentWeaponIndex + _weapons.Length - 1) % _weapons.Length;
         }
 
 	    private void Awake()
         {
+            _audioSource = GetComponent<AudioSource>();
+            _modifierCoroutines = new Dictionary<int, Coroutine>();
             SetupWeapons();
 
             void SetupWeapons()
             {
                 Transform weaponsTransform = transform.Find("Weapons");
                 _weapons = new IWeapon[weaponsTransform.childCount];
-                //_weapons = weaponsTransform.GetComponentsInChildren<IWeapon>();
+
 			    for (int i = 0; i < weaponsTransform.childCount; i++)
 			    {
                     _weapons[i] = weaponsTransform.GetChild(i).GetComponent<IWeapon>();
 			    }
             }
-            _onPointsAdded = new IntEvent();
+            //_onPointsAdded = new IntEvent();
         }
 
         // Update is called once per frame
@@ -45,13 +65,12 @@ namespace Player
         {
             if (Input.GetButtonDown("Fire1"))
 		    {
-                _weapons[_currentWeaponIndex].StartShooting(OnFireHit);
-                //todo start shooting
+                //_weapons[_currentWeaponIndex].StartShooting(OnFireHit);
+                _weapons[_currentWeaponIndex].StartShooting();
 		    }
             else if (Input.GetButtonUp("Fire1"))
 		    {
                 _weapons[_currentWeaponIndex].StopShooting();
-                //Todo stop shooting
 		    }
 
             float scrollWheel = Input.GetAxis("Mouse ScrollWheel");
@@ -61,10 +80,28 @@ namespace Player
             }
         }
 
-	    private void OnFireHit(int points)
-	    {
-            //_totalPoints += points;
-            _onPointsAdded.Invoke(points);
+	    //private void OnFireHit(int points)
+	    //{
+     //       //_totalPoints += points;
+     //       _onPointsAdded.Invoke(points);
+     //   }
+
+		private void OnTriggerEnter(Collider other)
+		{
+            Powerup powerup = other.GetComponent<Powerup>();
+            if (ReferenceEquals(powerup, null))
+                return;
+            else
+            {
+                Debug.Log("powerup picked up");
+                float value = powerup.WeaponModifierValue;
+                float duration = powerup.WeaponModifierDuration;
+                Enums.WeaponModifierType type = powerup.WeaponModifierType;
+                int key = (int)type;
+                _modifierCoroutines[key] = StartCoroutine(ActivateModifier(value, duration, type));
+                _audioSource.PlayOneShot(_powerupSound);
+                Destroy(other.gameObject);
+            }
         }
-    }
+	}
 }

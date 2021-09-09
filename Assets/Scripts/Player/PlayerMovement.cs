@@ -14,6 +14,10 @@ namespace Player
         private const float MAX_HORIZONTAL_ROTATION_DEG = 45f;
         private const float MAX_VERTICAL_ROTATION_DEG = 45f;
 
+        //private Vector3 _playerBoundsSize = Vector3.zero;
+
+        private Vector2 _playerMinPos = Vector2.zero;
+        private Vector2 _playerMaxPos = Vector2.zero;
         private const float PLAYER_MIN_X_POS = -6;
         private const float PLAYER_MAX_X_POS = 6;
         private const float PLAYER_MIN_Y_POS = -3;
@@ -57,7 +61,16 @@ namespace Player
             return targetRotation;
         }
 
-        private void Update()
+		private void Start()
+		{
+            //_playerBoundsSize = GetComponent<Renderer>().bounds.size;
+            //camera position - width/2
+            //camera position + width/2
+
+		}
+
+
+		private void Update()
         {
             float horizontal = Input.GetAxis("Horizontal");
             float vertical = Input.GetAxis("Vertical");

@@ -5,70 +5,72 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
-public class Plasmabullet : MonoBehaviour
+public class PlasmaBullet : MonoBehaviour
 {
 	[SerializeField] private float _force = 2f;
 	private Rigidbody _rigidbody;
-	private Action<int> _onHitCallback;
-	[SerializeField] private int _points = 5;
+	private SpriteRenderer _spriteRenderer;
 
 	[SerializeField] private float _damage = 5;
+	private float _damageModifier = 1f;
 
-	enum OwnerType { Enemy, Player};
-	[SerializeField] OwnerType _owner;
+	private Coroutine _coroutine;
 
-	public void Fire(Vector3 direction, Action<int> onHitCallBack)
+	public bool IsActive => gameObject.activeInHierarchy;
+	//Disable after seconds, to remove old floating bullets that are still somehow rendered by camera and thus not invisible
+	IEnumerator DisableAfterSeconds(float time)
 	{
-		_onHitCallback = onHitCallBack;
-		_rigidbody.AddForce(direction * _force, ForceMode.Impulse);
+		yield return new WaitForSeconds(time);
+		DisableObject();
 	}
 
-	private void DestroyBullet(int points)
+	public void ApplyColor(Color color)
 	{
-		_onHitCallback.Invoke(_points);
-		Destroy(gameObject);
+		_spriteRenderer.material.color = color;
+	}
+
+	public void ApplyDamageModifier(float modifier)
+	{
+		_damageModifier = modifier;
+	}
+	public void Fire(Vector3 direction)
+	{
+		_rigidbody.AddForce(direction * _force, ForceMode.Impulse);
+		_coroutine = StartCoroutine(DisableAfterSeconds(5f));
+	}
+
+	//private void DestroyBullet(int points)
+	//{
+
+	//	Destroy(gameObject);
+	//}
+
+	public void DisableObject()
+	{
+		_rigidbody.velocity = Vector3.zero;
+		_rigidbody.angularVelocity = Vector3.zero;
+		if (_coroutine != null)
+			StopCoroutine(_coroutine);
+		gameObject.SetActive(false);
+		EventManager.RaiseOnBulletDisabled(this);
 	}
 
 	private void OnBecameInvisible()
 	{
-		Destroy(gameObject);
+		DisableObject();
 	}
 
 	private void Awake()
 	{
+		_spriteRenderer = GetComponentInChildren<SpriteRenderer>();
 		_rigidbody = GetComponent<Rigidbody>();
 	}
 
 
 	private void OnTriggerEnter(Collider other)
 	{
-		if (_owner == OwnerType.Player)
-		{
-			Enemy enemy = other.gameObject.GetComponent<Enemy>();
-			if (ReferenceEquals(enemy, null))
-			{
-				DestroyBullet(0);
-			}
-			else
-			{	
-				enemy.ReduceHealth(_damage);
-				DestroyBullet(enemy.Hit());
-			}
-				
-		}
-		else
-		{
-			PlayerController player = other.GetComponent<PlayerController>();
-			if (ReferenceEquals(player, null))
-			{
-				Destroy(gameObject);
-			}
-			else
-			{
-				player.ReduceHealth(_damage);
-				Destroy(gameObject);
-			}
-				
-		}
+		IHealth health = other.GetComponent<IHealth>();
+		health?.TakeDamage(_damage * _damageModifier);
+		DisableObject();
 	}
 }

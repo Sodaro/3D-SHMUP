@@ -7,6 +7,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 258866790178959876, guid: 36f0734a420c2af46944a7ff75dff5a8, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1373052262411365249, guid: 36f0734a420c2af46944a7ff75dff5a8, type: 3}
       propertyPath: m_Name
       value: Plasmabullet_Enemy
