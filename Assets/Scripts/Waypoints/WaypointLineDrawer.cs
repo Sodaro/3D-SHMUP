@@ -6,29 +6,15 @@ using UnityEngine;
 [CustomEditor(typeof(DrawLine))]
 public class WaypointLineDrawer : Editor
 {
-    //private Transform[] _waypoints;
-
-    //void OnEnable()
-    //{
-    //    SceneView.duringSceneGui += this.OnSceneGUI;
-    //}
-
-    //void OnDisable()
-    //{
-    //    SceneView.duringSceneGui -= this.OnSceneGUI;
-    //}
     public override void OnInspectorGUI()
     {
         //Called whenever the inspector is drawn for this object.
         DrawDefaultInspector();
-        //This draws the default screen.  You don't need this if you want
-        //to start from scratch, but I use this when I'm just adding a button or
-        //some small addition and don't feel like recreating the whole inspector.
+
         if (GUILayout.Button("Create New Waypoint"))
         {
             DrawLine t = target as DrawLine;
             t.CreateNewWaypoint();
-            //add everthing the button would do.
         }
 
         if (GUILayout.Button("Waypoint LookAt Next"))
@@ -37,9 +23,7 @@ public class WaypointLineDrawer : Editor
             for (int i = 0; i < t.gameObjects.Count - 1; i++)
             {
                 t.gameObjects[i].transform.LookAt(t.gameObjects[i + 1].transform);
-                //Handles.DrawBezier(p1, p2, p1, p2, Color.yellow, null, 12f);
             }
-            //add everthing the button would do.
         }
     }
 

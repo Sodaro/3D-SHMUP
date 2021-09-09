@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using HelperClasses;
 
 namespace Player
@@ -60,24 +61,32 @@ namespace Player
             //_onPointsAdded = new IntEvent();
         }
 
+        public void OnFire(InputAction.CallbackContext context)
+		{
+            if (context.started)
+                _weapons[_currentWeaponIndex].StartShooting();
+            else if (context.canceled)
+                _weapons[_currentWeaponIndex].StopShooting();
+        }
+
         // Update is called once per frame
         void Update()
         {
-            if (Input.GetButtonDown("Fire1"))
-		    {
-                //_weapons[_currentWeaponIndex].StartShooting(OnFireHit);
-                _weapons[_currentWeaponIndex].StartShooting();
-		    }
-            else if (Input.GetButtonUp("Fire1"))
-		    {
-                _weapons[_currentWeaponIndex].StopShooting();
-		    }
+      //      if (Input.GetButtonDown("Fire1"))
+		    //{
+      //          //_weapons[_currentWeaponIndex].StartShooting(OnFireHit);
+      //          _weapons[_currentWeaponIndex].StartShooting();
+		    //}
+      //      else if (Input.GetButtonUp("Fire1"))
+		    //{
+      //          _weapons[_currentWeaponIndex].StopShooting();
+		    //}
 
-            float scrollWheel = Input.GetAxis("Mouse ScrollWheel");
-            if (!Mathf.Approximately(scrollWheel, 0f)) 
-            {
-                StepWeapon(scrollWheel);
-            }
+      //      float scrollWheel = Input.GetAxis("Mouse ScrollWheel");
+      //      if (!Mathf.Approximately(scrollWheel, 0f)) 
+      //      {
+      //          StepWeapon(scrollWheel);
+      //      }
         }
 
 	    //private void OnFireHit(int points)

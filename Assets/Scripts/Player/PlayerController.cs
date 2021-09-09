@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using HelperClasses;
 
 namespace Player
@@ -53,19 +54,35 @@ namespace Player
         {
             DisableMenu();
         }
+
+        public void OnPause(InputAction.CallbackContext context)
+		{
+            if (_isDead)
+                return;
+
+            if (_menu.activeInHierarchy)
+            {
+                DisableMenu();
+            }
+            else
+            {
+                EnableMenu();
+            }
+        }
+
         void Update()
 		{
-            if (Input.GetButtonDown("Menu") && !_isDead)
-			{
-                if (_menu.activeInHierarchy)
-				{
-                    DisableMenu();
-                }
-                else
-				{
-                    EnableMenu();
-                }
-			}
+   //         if (Input.GetButtonDown("Menu") && !_isDead)
+			//{
+   //             if (_menu.activeInHierarchy)
+			//	{
+   //                 DisableMenu();
+   //             }
+   //             else
+			//	{
+   //                 EnableMenu();
+   //             }
+			//}
 		}
 
 		private void OnTriggerEnter(Collider other)
