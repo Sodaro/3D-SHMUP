@@ -21,7 +21,7 @@ public class WorldCamera : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        transform.position += _cameraMover.GetVelocity() / _scaleFactor;
+        transform.position += _cameraMover.Velocity / _scaleFactor * Time.deltaTime;
         transform.rotation = Quaternion.Slerp(transform.rotation, _cameraToMirror.transform.rotation, 1/_scaleFactor);
     }
 }

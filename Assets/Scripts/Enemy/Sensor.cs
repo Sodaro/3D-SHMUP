@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Player;
 
-public class EnemySensor : MonoBehaviour
+public class Sensor : MonoBehaviour
 {
 
     public GameObjectEvent _playerEnteredEvent;
@@ -23,10 +23,11 @@ public class EnemySensor : MonoBehaviour
 
 	private void OnTriggerEnter(Collider other)
 	{
-        PlayerController player = other.GetComponent<PlayerController>();
+        PlayerController player = other.GetComponentInParent<PlayerController>();
         if (player == null)
             return;
 
+        
         _playerEnteredEvent.Invoke(other.gameObject);
 
 	}

@@ -6,6 +6,8 @@ public class RingRotation : MonoBehaviour
 {
     void Update()
     {
-        transform.rotation = Quaternion.Euler(0, 0, Mathf.Sin(Time.time) * 100);
+        //Vector3 eulerAngles = transform.rotation.eulerAngles;
+        //eulerAngles.z = Mathf.Sin(Time.time) * 180;
+        transform.localRotation = Quaternion.Euler(0,0, Mathf.Sin(Time.time) * 180);
     }
 }

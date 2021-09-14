@@ -9,14 +9,11 @@ public enum BuildScene { MainMenu, Level1, Count}
 
 public class SceneHandler : MonoBehaviour
 {
-
-
-
     private static SceneHandler _instance;
 
     public static SceneHandler Instance => _instance;
 
-    public void RestartScene()
+	public void RestartScene()
 	{
         Scene activeScene = SceneManager.GetActiveScene();
         SceneManager.LoadScene(activeScene.buildIndex);
@@ -49,7 +46,7 @@ public class SceneHandler : MonoBehaviour
         #if UNITY_EDITOR
                 UnityEditor.EditorApplication.isPlaying = false;
         #else
-			          Application.Quit();
+			    Application.Quit();
         #endif
     }
 

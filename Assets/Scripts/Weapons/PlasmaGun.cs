@@ -1,11 +1,10 @@
-using HelperClasses;
-using System;
+using MyUtilities;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlasmaGun : MonoBehaviour, IWeapon
 {
+	[SerializeField] private CameraMover _cameraMover;
 	[SerializeField] private GameObject _bulletPrefab;
 	[SerializeField] private float _roundsPerMinute = 60f;
 
@@ -40,7 +39,6 @@ public class PlasmaGun : MonoBehaviour, IWeapon
 		IsShooting = false;
 	}
 
-	//private IEnumerator Shooting(float startDelay, Action<int> onHitCallBack)
 	private IEnumerator Shooting(float startDelay)
 	{
 		IsShooting = true;
@@ -50,28 +48,23 @@ public class PlasmaGun : MonoBehaviour, IWeapon
 		}
 		while(true)
 		{
-			//FireShot(onHitCallBack);
 			FireShot();
 			_timeOfLastShot = Time.time;
 			yield return new WaitForSeconds(_timeBetweenShots / _attackRateModifier);
 		}
-
 	}
 
-	//private void FireShot(Action<int> onHitCallBack)
 	private void FireShot()
 	{
-		PlasmaBullet bullet = BulletObjectPool.Instance.GetPooledObject();
+		Projectile bullet = BulletPool.Instance.GetPooledObject();
 		if (bullet == null)
 			return;
-		
-		bullet.gameObject.transform.position = transform.position;
-		bullet.gameObject.transform.rotation = transform.rotation;
+
+		bullet.gameObject.transform.SetPositionAndRotation(transform.position, transform.rotation);
 		bullet.gameObject.SetActive(true);
 		Vector3 direction = transform.forward;
-		//PlasmaBullet plasmaBullet = bullet.GetComponent<PlasmaBullet>();
-		//PlasmaBullet plasmaBullet = Instantiate(_bulletPrefab, _transform.position, transform.rotation)?.GetComponent<PlasmaBullet>();
-		bullet?.Fire(direction);
+
+		bullet?.Fire(direction, _cameraMover.Velocity);
 		bullet?.ApplyDamageModifier(_damageModifier);
 		bullet?.ApplyColor(_color);
 		_audio.PlayOneShot(_audio.clip);
@@ -84,16 +77,16 @@ public class PlasmaGun : MonoBehaviour, IWeapon
 		_audio = GetComponent<AudioSource>();
 	}
 
-	public void ApplyModifier(float value, Enums.WeaponModifierType modifierType)
+	public void ApplyModifier(float value, WeaponModifierType modifierType)
 	{
 		switch(modifierType)
 		{
-			case Enums.WeaponModifierType.AttackRate:
+			case WeaponModifierType.AttackRate:
 				_attackRateModifier = value;
 				_color.g = 1;
 				_color.b = 0;
 				break;
-			case Enums.WeaponModifierType.Damage:
+			case WeaponModifierType.Damage:
 				_damageModifier = value;
 				_color.r = 1;
 				_color.b = 0;
@@ -101,15 +94,15 @@ public class PlasmaGun : MonoBehaviour, IWeapon
 		}
 	}
 
-	public void RemoveModifier(Enums.WeaponModifierType modifierType)
+	public void RemoveModifier(WeaponModifierType modifierType)
 	{
 		switch(modifierType)
 		{
-			case Enums.WeaponModifierType.Damage:
+			case WeaponModifierType.Damage:
 				_damageModifier = 1f;
 				_color.r = 0;
 				break;
-			case Enums.WeaponModifierType.AttackRate:
+			case WeaponModifierType.AttackRate:
 				_attackRateModifier = 1f;
 				_color.g = 0;
 

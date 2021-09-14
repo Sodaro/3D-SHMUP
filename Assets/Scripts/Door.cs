@@ -4,11 +4,15 @@ using UnityEngine;
 
 public class Door : MonoBehaviour
 {
-    [SerializeField] Transform upperHalf;
-    [SerializeField] Transform lowerHalf;
+    [SerializeField] Sensor _sensor;
+    [SerializeField] Transform _upperHalf;
+    [SerializeField] Transform _lowerHalf;
 
     [SerializeField] private float _delay;
-    [SerializeField] private float _duration;
+    [SerializeField] private float _delayBetweenSequence;
+
+    [SerializeField] private float _rotationDuration = 1f;
+    [SerializeField] private float _moveDuration = 1f;
     [SerializeField] private float _moveDistance;
 
     [SerializeField] private float _rotationDegrees;
@@ -16,39 +20,24 @@ public class Door : MonoBehaviour
     private MeshRenderer[] _renderers;
 
     [SerializeField] private bool _isOpen;
-
-    public void OpenDoor()
-	{
-        if (!_isOpen)
-            StartCoroutine(RotateAndOpen(2, 1));
-    }
-
-    public void CloseDoor()
-	{
-        if (_isOpen)
-            StartCoroutine(CloseAndRotate(2, 1));
-    }
-
-	private void Awake()
-	{
+    private void Awake()
+    {
         _renderers = GetComponentsInChildren<MeshRenderer>();
         foreach (var renderer in _renderers)
             renderer.materials[1].EnableKeyword("_EMISSION");
-	}
-
-    void MoveHalvesToOpenPositions()
-	{
-        upperHalf.localRotation = Quaternion.Euler(0, 0, upperHalf.transform.localRotation.eulerAngles.z + _rotationDegrees);
-        lowerHalf.localRotation = Quaternion.Euler(0, 0, lowerHalf.transform.localRotation.eulerAngles.z + _rotationDegrees);
-
-        upperHalf.position = transform.position + upperHalf.up * _moveDistance;
-        lowerHalf.position = transform.position + lowerHalf.up * _moveDistance;
+        _sensor?._playerEnteredEvent.AddListener(delegate 
+        {
+            if (_isOpen)
+                CloseDoor();
+            else
+                OpenDoor();
+        });
     }
-	// Start is called before the first frame update
-	void Start()
+
+    void Start()
     {
         if (_isOpen)
-		{
+        {
             MoveHalvesToOpenPositions();
             foreach (var renderer in _renderers)
             {
@@ -56,11 +45,33 @@ public class Door : MonoBehaviour
             }
 
         }
-        //StartCoroutine(OpenDoor(_delay, _duration, _moveDistance));
+    }
+
+    public void OpenDoor()
+	{
+		Debug.Log($"opening door");
+        if (!_isOpen)
+            StartCoroutine(RotateAndOpen(_delay, _delayBetweenSequence));
+    }
+
+    public void CloseDoor()
+	{
+        if (_isOpen)
+            StartCoroutine(CloseAndRotate(_delay, _delayBetweenSequence));
+    }
+
+    void MoveHalvesToOpenPositions()
+	{
+        _upperHalf.localRotation = Quaternion.Euler(0, 0, _upperHalf.transform.localRotation.eulerAngles.z + _rotationDegrees);
+        _lowerHalf.localRotation = Quaternion.Euler(0, 0, _lowerHalf.transform.localRotation.eulerAngles.z + _rotationDegrees);
+
+        _upperHalf.position = transform.position + _upperHalf.up * _moveDistance;
+        _lowerHalf.position = transform.position + _lowerHalf.up * _moveDistance;
     }
 
     float easeInQuart(float x)
     {
+        //credits easings.net
         return x* x * x* x;
     }
     float easeOutQuart(float x)
@@ -74,9 +85,9 @@ public class Door : MonoBehaviour
         if (startDelay > 0)
             yield return new WaitForSeconds(startDelay);
 
-        yield return StartCoroutine(RotateZ(_duration, _rotationDegrees));
+        yield return StartCoroutine(RotateZ(_rotationDuration, _rotationDegrees));
         yield return new WaitForSeconds(delayBetweenSequence);
-        yield return StartCoroutine(OpenDoor(_duration, _moveDistance));
+        yield return StartCoroutine(OpenDoor(_moveDuration, _moveDistance));
         _isOpen = true;
         
     }
@@ -86,9 +97,9 @@ public class Door : MonoBehaviour
         if (startDelay > 0)
             yield return new WaitForSeconds(startDelay);
 
-        yield return StartCoroutine(CloseDoor(_duration, _moveDistance));
+        yield return StartCoroutine(CloseDoor(_moveDuration, _moveDistance));
         yield return new WaitForSeconds(delayBetweenSequence);
-        yield return StartCoroutine(RotateZ(_duration, -(_rotationDegrees)));
+        yield return StartCoroutine(RotateZ(_rotationDuration, -(_rotationDegrees)));
         _isOpen = false;
     }
 
@@ -96,29 +107,29 @@ public class Door : MonoBehaviour
 	{
         float f = 0;
         
-        Quaternion upperStartQuaternion = upperHalf.localRotation;
-        Quaternion lowerStartQuaternion = lowerHalf.localRotation;
+        Quaternion upperStartQuaternion = _upperHalf.localRotation;
+        Quaternion lowerStartQuaternion = _lowerHalf.localRotation;
         Quaternion upperTargetQuaternion = Quaternion.Euler(0,0, upperStartQuaternion.eulerAngles.z + degrees);
         Quaternion lowerTargetQuaternion = Quaternion.Euler(0,0, lowerStartQuaternion.eulerAngles.z + degrees);
 
         while (f < duration)
         {
-            upperHalf.localRotation = Quaternion.Lerp(upperStartQuaternion, upperTargetQuaternion, f / duration);
-            lowerHalf.localRotation = Quaternion.Lerp(lowerStartQuaternion, lowerTargetQuaternion, f / duration);
+            _upperHalf.localRotation = Quaternion.Lerp(upperStartQuaternion, upperTargetQuaternion, f / duration);
+            _lowerHalf.localRotation = Quaternion.Lerp(lowerStartQuaternion, lowerTargetQuaternion, f / duration);
 
             f += Time.deltaTime;
             yield return null;
         }
-        upperHalf.localRotation = upperTargetQuaternion;
-        lowerHalf.localRotation = lowerTargetQuaternion;
+        _upperHalf.localRotation = upperTargetQuaternion;
+        _lowerHalf.localRotation = lowerTargetQuaternion;
     }
 
     IEnumerator OpenDoor(float duration, float distance)
     {
         float f = 0;
 
-        Vector3 upperTargetPos = upperHalf.up * distance;
-        Vector3 lowerTargetPos = lowerHalf.up * distance;
+        Vector3 upperTargetPos = _upperHalf.up * distance;
+        Vector3 lowerTargetPos = _lowerHalf.up * distance;
 
         while (f < duration)
         {
@@ -134,8 +145,8 @@ public class Door : MonoBehaviour
                 renderer.materials[1].SetColor("_EmissionColor", Color.Lerp(Color.black, Color.green, f / duration));
             }
 
-            upperHalf.position = transform.position + upperPos;
-            lowerHalf.position = transform.position + lowerPos;
+            _upperHalf.position = transform.position + upperPos;
+            _lowerHalf.position = transform.position + lowerPos;
 
             f += Time.deltaTime;
             yield return null;
@@ -147,11 +158,11 @@ public class Door : MonoBehaviour
 	{
         float f = 0;
 
-        Vector3 upperTargetPos = -upperHalf.up * distance;
-        Vector3 lowerTargetPos = -lowerHalf.up * distance;
+        Vector3 upperTargetPos = -_upperHalf.up * distance;
+        Vector3 lowerTargetPos = -_lowerHalf.up * distance;
 
-        Vector3 upperStartPos = upperHalf.position;
-        Vector3 lowerStartPos = lowerHalf.position;
+        Vector3 upperStartPos = _upperHalf.position;
+        Vector3 lowerStartPos = _lowerHalf.position;
 
         while (f < duration)
 		{
@@ -165,9 +176,9 @@ public class Door : MonoBehaviour
             }
 
             if (upperPos != Vector3.zero)
-                upperHalf.position = upperStartPos + upperPos;
+                _upperHalf.position = upperStartPos + upperPos;
             if (lowerPos != Vector3.zero)
-                lowerHalf.position = lowerStartPos + lowerPos;
+                _lowerHalf.position = lowerStartPos + lowerPos;
 
             f += Time.deltaTime;
             yield return null;

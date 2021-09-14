@@ -1,69 +1,70 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-//Generic Object Pool
-public class ObjectPool : MonoBehaviour
+public abstract class ObjectPool<T> : MonoBehaviour where T : Component
 {
-	private static ObjectPool _instance;
 
-	public static ObjectPool Instance => _instance;
+	public static ObjectPool<T> Instance { get; private set; }
 
-	[SerializeField][Tooltip("The object that will be instantiated.")]
-	private GameObject _gameObjectToPool;
+	[SerializeField]
+	[Tooltip("The object that will be instantiated.")]
+	private T _prefab;
 
-	[SerializeField][Tooltip("The initial size of the pool.")]
+	[SerializeField]
+	[Tooltip("The initial size of the pool.")]
 	private int _initialPoolSize;
 
-	private List<GameObject> _objectPool;
+	private Queue<T> _freeList;
 
-	[SerializeField][Tooltip("Toggle whether the pool can expand if required.")]
+	[SerializeField]
+	[Tooltip("Toggle whether the pool can expand if required.")]
 	private bool _canExpand = false;
 
-	private void Awake()
+	protected void Awake()
 	{
-		if (_instance != null && _instance != this)
+		if (Instance != null && Instance != this)
 		{
 			Destroy(gameObject);
 		}
 		else
 		{
-			_instance = this;
+			Instance = this;
 		}
+
+		//EventManager.onProjectileDisabled += OnProjectileDisabled;
 	}
-
-
-	private void Start()
+	protected void Start()
 	{
-		GameObject instance;
-		_objectPool = new List<GameObject>();
+		_freeList = new Queue<T>();
 		for (int i = 0; i < _initialPoolSize; i++)
 		{
-			instance = Instantiate(_gameObjectToPool);
-			instance.SetActive(false);
-			_objectPool.Add(instance);
+			T instance = Instantiate(_prefab);
+			instance.gameObject.SetActive(false);
+			_freeList.Enqueue(instance);
 		}
 	}
 
-	public GameObject GetPooledObject()
+	public void AddBackToPool(T objectToAdd)
+	{
+		_freeList.Enqueue(objectToAdd);
+	}
+
+	protected void OnGameObjectDisabled(T disabledObject)
+	{
+		_freeList.Enqueue(disabledObject);
+	}
+
+	public T GetPooledObject()
 	{
 		//find an inactive object
-		for (int i = 0; i < _objectPool.Count; i++)
-		{
-			if (!_objectPool[i].activeInHierarchy)
-			{
-				return _objectPool[i];
-			}
-		}
-		
+		if (_freeList.Count != 0)
+			return _freeList.Dequeue();
 		if (!_canExpand)
 			return null;
 
-		//expand pool
-		GameObject instance = Instantiate(_gameObjectToPool);
-		instance.SetActive(false);
-		_objectPool.Add(instance);
+		T instance = Instantiate(_prefab);
+		instance.gameObject.SetActive(false);
+		_freeList.Enqueue(instance);
 		return instance;
-		
 	}
 }

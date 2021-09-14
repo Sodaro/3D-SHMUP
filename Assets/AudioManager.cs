@@ -26,14 +26,4 @@ public class AudioManager : MonoBehaviour
     {
         _audioMixer.SetFloat(_audioMixerGroups[audioGroup], 20f * Mathf.Log10(volume));
     }
-
-    //public void SetMusicVolume(float volume)
-    //{
-    //    _audioMixer.SetFloat("music", 20f*Mathf.Log10(volume));
-    //}
-
-    //public void SetSFXVolume(float volume)
-    //{
-    //    _audioMixer.SetFloat("sfx", 20f * Mathf.Log10(volume));
-    //}
 }

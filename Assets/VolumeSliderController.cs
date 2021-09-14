@@ -7,6 +7,7 @@ using UnityEngine.InputSystem;
 
 public class VolumeSliderController : Selectable
 {
+
 	[SerializeField] private Slider _slider;
 	[SerializeField] private TMP_InputField _inputField;
 
@@ -91,6 +92,14 @@ public class VolumeSliderController : Selectable
 		_isSelected = false;
 	}
 
+	public void ChangeSliderValue(Vector2 vector2)
+	{
+		_moveAxis = vector2;
+		//_slider.value += amount * Time.deltaTime;
+	}
+
+
+
 	void UpdateSliderPosition(string value)
 	{
 		//value 0-100, fires only on submit pressed
@@ -125,8 +134,8 @@ public class VolumeSliderController : Selectable
 
 	private void Update()
 	{
-		//if (!_isSelected)
-		//	return;
+		if (!_isSelected)
+			return;
 
 		_slider.value += _moveAxis.x * Time.deltaTime;
 		//float horizontal = Input.GetAxisRaw("Horizontal");

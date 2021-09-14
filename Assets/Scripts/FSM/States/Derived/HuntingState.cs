@@ -12,6 +12,7 @@ public class HuntingState : State
 	{
 		//Debug.Log($"State entered: {this}");
 		base.Enter();
+		_enemy.StartShooting();
 		//_stateMachine.ChangeState(new DormantState(_enemy, _stateMachine));
 	}
 
@@ -31,5 +32,13 @@ public class HuntingState : State
 		base.Update();
 		_enemy.RotateTowardsTarget();
 		_enemy.MoveTowardsTarget();
+
+		if (_enemy.HasAllyInFront)
+			_enemy.StopShooting();
+		else
+		{
+			if (!_enemy.IsShooting)
+				_enemy.StartShooting();
+		}
 	}
 }

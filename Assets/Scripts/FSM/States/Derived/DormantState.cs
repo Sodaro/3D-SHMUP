@@ -11,6 +11,7 @@ public class DormantState : State
 	public override void Enter()
 	{
 		base.Enter();
+		_enemy.StopShooting();
 	}
 
 	public override void Exit()

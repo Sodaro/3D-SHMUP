@@ -10,11 +10,11 @@ GameObject:
   m_Component:
   - component: {fileID: 3900813557931969576}
   - component: {fileID: 3900813557931969577}
-  - component: {fileID: 3900813557931969574}
+  - component: {fileID: 2433304565445335521}
   m_Layer: 10
-  m_Name: EnemySensor
+  m_Name: Sensor
   m_TagString: Untagged
-  m_Icon: {fileID: 3306451490063965843, guid: 0000000000000000d000000000000000, type: 0}
+  m_Icon: {fileID: 3936346786652291628, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -45,7 +45,7 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 5
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &3900813557931969574
+--- !u!114 &2433304565445335521
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -54,7 +54,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 3900813557931969575}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 106e65a33604e1046af0afa6639877ba, type: 3}
+  m_Script: {fileID: 11500000, guid: 4895cf79a7171204291af7586621c271, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _playerEnteredEvent:

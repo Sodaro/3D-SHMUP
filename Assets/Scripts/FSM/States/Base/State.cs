@@ -25,31 +25,4 @@ public abstract class State
 		_enemy = enemy;
 		_stateMachine = stateMachine;
 	}
-
-	
-
-	//public virtual void Enter()
-	//{
-	//    DisplayOnUI(UIManager.Alignment.Left);
-	//}
-
-	//public virtual void HandleInput()
-	//{
-
-	//}
-
-	//public virtual void LogicUpdate()
-	//{
-
-	//}
-
-	//public virtual void PhysicsUpdate()
-	//{
-
-	//}
-
-	//public virtual void Exit()
-	//{
-
-	//}
 }
