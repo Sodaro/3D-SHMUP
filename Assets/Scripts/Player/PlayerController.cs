@@ -214,7 +214,6 @@ namespace Player
             if (_isDead)
                 return;
 
-			Debug.Log($"pause");
             //toggle menu
             EventManager.RaiseOnGamePause(!_menu.activeInHierarchy);
         }

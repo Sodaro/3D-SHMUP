@@ -71,7 +71,7 @@ public class Enemy : MonoBehaviour, IHealth
 	{
 		get
 		{
-			if (Physics.SphereCast(_bulletSpawnTransform.position, 5f, transform.forward, out RaycastHit _, 100f, gameObject.layer))
+			if (Physics.SphereCast(transform.position, 1f, transform.forward, out RaycastHit _, 100f, LayerMask.GetMask("Enemy")))
 			{
 				return true;
 			}
@@ -99,6 +99,11 @@ public class Enemy : MonoBehaviour, IHealth
 			Destroy(gameObject);
 		}
 			
+	}
+
+	private void FixedUpdate()
+	{
+		
 	}
 
 	public void HealDamage(float amount)

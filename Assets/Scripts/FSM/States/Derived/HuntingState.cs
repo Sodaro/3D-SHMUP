@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public class HuntingState : State
 {
 	public HuntingState(Enemy enemy, StateMachine stateMachine) : base(enemy, stateMachine)
@@ -7,7 +9,6 @@ public class HuntingState : State
 	public override void Enter()
 	{
 		base.Enter();
-		_enemy.StartShooting();
 	}
 
 	public override void Exit()
@@ -27,7 +28,9 @@ public class HuntingState : State
 		_enemy.MoveTowardsTarget();
 
 		if (_enemy.HasAllyInFront)
+		{
 			_enemy.StopShooting();
+		}
 		else
 		{
 			if (!_enemy.IsShooting)

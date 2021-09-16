@@ -131,7 +131,6 @@ namespace Player
                 return;
             else
             {
-                Debug.Log("powerup picked up");
                 float value = powerup.WeaponModifierValue;
                 float duration = powerup.WeaponModifierDuration;
                 WeaponModifierType type = powerup.WeaponModifierType;

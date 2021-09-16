@@ -52,7 +52,6 @@ public class Door : MonoBehaviour
 
     public void OpenDoor()
 	{
-		Debug.Log($"opening door");
         if (!_isOpen)
             StartCoroutine(RotateAndOpen(_delay, _delayBetweenSequence));
     }
