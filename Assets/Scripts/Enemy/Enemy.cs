@@ -1,19 +1,14 @@
 using MyUtilities;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [SelectionBase]
-public class Enemy : MonoBehaviour, IHealth, IWeapon
+public class Enemy : MonoBehaviour, IHealth
 {
-	[SerializeField] private GameObject _bulletPrefab;
 	[SerializeField] private float _roundsPerMinute = 60f;
 
 	private float _timeBetweenShots;
 	private float _timeOfLastShot;
-
-	//private float _attackRateModifier = 1f;
-	//private float _damageModifier = 1f;
 
 	private Coroutine _shootingRoutine;
 	private AudioSource _audioSource;
@@ -52,14 +47,9 @@ public class Enemy : MonoBehaviour, IHealth, IWeapon
 	private void Update()
 	{
 		_stateMachine.CurrentState.Update();
-		//if (_stateMachine.CurrentState is HuntingState)
-		//{
-		//	if (HasPassedPlayer)
-		//		_stateMachine.ChangeState(new DormantState(this, _stateMachine));
-		//}
 	}
 
-	void OnBecameInvisible()
+	private void OnBecameInvisible()
 	{
 		_stateMachine.ChangeState(new DormantState(this, _stateMachine));
 	}
@@ -81,7 +71,7 @@ public class Enemy : MonoBehaviour, IHealth, IWeapon
 	{
 		get
 		{
-			if (Physics.Raycast(_bulletSpawnTransform.position, transform.forward, 20f, gameObject.layer))
+			if (Physics.SphereCast(_bulletSpawnTransform.position, 5f, transform.forward, out RaycastHit _, 100f, gameObject.layer))
 			{
 				return true;
 			}
@@ -89,23 +79,14 @@ public class Enemy : MonoBehaviour, IHealth, IWeapon
 		}
 	}
 
-	//public bool HasPassedPlayer
-	//{
-	//	get
-	//	{
-	//		return GetComponent<Renderer>().isVisible;
-	//	}
-	//}
-
 	public void RotateTowardsTarget()
 	{
 		//find the vector pointing from our position to the target
 		Vector3 _direction = (_target.transform.position - transform.position).normalized;
 
-		//create the rotation we need to be in to look at the target
 		Quaternion _lookRotation = Quaternion.LookRotation(_direction);
 
-		//rotate us over time according to speed until we are in the required rotation
+		//rotate over time using specified speed
 		transform.rotation = Quaternion.Slerp(transform.rotation, _lookRotation, Time.deltaTime * _rotationSpeed);
 	}
 
@@ -170,19 +151,8 @@ public class Enemy : MonoBehaviour, IHealth, IWeapon
 		bullet.gameObject.SetActive(true);
 		Vector3 direction = transform.forward;
 
-		bullet?.Fire(direction, _velocity);
-		//bullet?.ApplyDamageModifier(_damageModifier);
-		bullet?.ApplyColor(Color.cyan);
+		bullet.Fire(direction, _velocity);
+		bullet.ApplyColor(Color.cyan);
 		_audioSource.PlayOneShot(_audioSource.clip);
-	}
-
-	public void ApplyModifier(float value, WeaponModifierType modifierType)
-	{
-		throw new System.NotImplementedException();
-	}
-
-	public void RemoveModifier(WeaponModifierType modifierType)
-	{
-		throw new System.NotImplementedException();
 	}
 }

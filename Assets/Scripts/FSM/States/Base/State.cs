@@ -11,11 +11,11 @@ public abstract class State
 	public virtual void HandleInput() { }
     public virtual void Enter() 
 	{ 
-		Debug.Log($"State entered: {this}");
+		//Debug.Log($"State entered: {this}");
 	}
     public virtual void Exit()
 	{
-		Debug.Log($"State exited: {this}");
+		//Debug.Log($"State exited: {this}");
 	}
 	public virtual void Update() { }
 	//protected StateMachine stateMachine;

@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
 using TMPro;
 using UnityEngine;
 
@@ -9,15 +6,6 @@ public class ScoreManager : MonoBehaviour
 	[SerializeField] private TextMeshProUGUI _text;
 
 	private int _score = 0;
-	//public void SetText(int value)
-	//{
-	//	_text.text = value.ToString(CultureInfo.InvariantCulture);
-	//}
-
-	private void Awake()
-	{
-		//_text = GetComponent<TextMeshProUGUI>();
-	}
 
 	private void ChangeScore(int amount)
 	{
@@ -43,6 +31,6 @@ public class ScoreManager : MonoBehaviour
 	}
 	private void OnDisable()
 	{
-		
+		EventManager.onPointsAdded -= ChangeScore;
 	}
 }

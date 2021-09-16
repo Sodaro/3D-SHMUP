@@ -1,19 +1,23 @@
-using System;
+using MyUtilities;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using MyUtilities;
 
 namespace Player
 {
-    public class PlayerShooting : MonoBehaviour
+	public class PlayerShooting : MonoBehaviour
     {
-        [SerializeField] private GameObject _rocketLauncher;
-        [SerializeField] private GameObject _plasmaGun;
-        private IWeapon[] _weapons;
-        private int _currentWeaponIndex = 0;
-        //internal IntEvent _onPointsAdded;
+        /// <summary>
+        /// Handle weapon shooting logic of player.
+        /// </summary>
+        [SerializeField] private WeaponBase _rocketLauncher;
+        [SerializeField] private WeaponBase _plasmaGun;
+        private WeaponBase[] _weapons;
+
+        private WeaponBase _activeWeapon;
+
+        private List<WeaponBase> _weaponBacklog;
 
         [SerializeField] AudioClip _powerupSound;
         AudioSource _audioSource;
@@ -22,69 +26,108 @@ namespace Player
 
         public IEnumerator ActivateModifier(float value, float time, WeaponModifierType weaponModifier)
 		{
-
             foreach (var weapon in _weapons)
-                weapon?.ApplyModifier(value, weaponModifier);
+			{
+                if (weapon == null)
+                    continue;
+                weapon.ApplyModifier(value, weaponModifier);
+            }
 
             yield return new WaitForSeconds(time);
 
             foreach (var weapon in _weapons)
-                weapon?.RemoveModifier(weaponModifier);
-        }
-
-        public void StepWeapon(float direction) 
-        {
-      //      if (_weapons[_currentWeaponIndex].IsShooting)
-		    //{
-      //          _weapons[_currentWeaponIndex].StopShooting();
-		    //}
-      //      if (direction > 0)
-      //          _currentWeaponIndex = (_currentWeaponIndex + 1) % _weapons.Length;
-      //      else
-      //          _currentWeaponIndex = (_currentWeaponIndex + _weapons.Length - 1) % _weapons.Length;
+			{
+                if (weapon == null)
+                    continue;
+                weapon.RemoveModifier(weaponModifier);
+            }
         }
 
 		private void Awake()
         {
-            _weapons = new IWeapon[2] { _plasmaGun.GetComponent<IWeapon>(), _rocketLauncher.GetComponent<IWeapon>() };
+            _weapons = new WeaponBase[] { _plasmaGun, _rocketLauncher };
             _audioSource = GetComponent<AudioSource>();
             _modifierCoroutines = new Dictionary<int, Coroutine>();
-       //     SetupWeapons();
-
-       //     void SetupWeapons()
-       //     {
-       //         Transform weaponsTransform = transform.Find("Weapons");
-       //         _weapons = new IWeapon[weaponsTransform.childCount];
-
-			    //for (int i = 0; i < weaponsTransform.childCount; i++)
-			    //{
-       //             _weapons[i] = weaponsTransform.GetChild(i).GetComponent<IWeapon>();
-			    //}
-       //     }
+            _weaponBacklog = new List<WeaponBase>();
         }
 
         public void OnFireRocket(InputAction.CallbackContext context)
 		{
-			Debug.Log($"shoot rockets!");
-            if (context.started)
-                _weapons[1].StartShooting();
-            else if (context.canceled)
-                _weapons[1].StopShooting();
-		}
-
-        public void OnFire(InputAction.CallbackContext context)
-		{
-            if (context.started)
-                _weapons[0].StartShooting();
-            else if (context.canceled)
-                _weapons[0].StopShooting();
+            HandleWeaponSwitch(context, _rocketLauncher);
         }
 
+        public void OnFire(InputAction.CallbackContext context)
+        {
+            HandleWeaponSwitch(context, _plasmaGun);
+        }
+
+        private void HandleWeaponSwitch(InputAction.CallbackContext context, WeaponBase weapon)
+		{
+            //button to shoot weapon was pressed, put active weapon on backlog until newWeapon is released or old weapon button is released
+            if (context.started)
+            {
+                if (_activeWeapon != null && _activeWeapon != weapon)
+                {
+                    AddToBacklog(_activeWeapon);
+                    _activeWeapon.StopShooting();
+                }
+                _activeWeapon = weapon;
+                _activeWeapon.StartShooting();
+            }
+            else if (context.canceled)
+            {
+                if (weapon != null)
+				{
+                    weapon.StopShooting();
+                    RemoveFromBacklog(weapon);
+                }
+                //the currently activeweapon was canceled, check if one is on the backlog and activate that one instead
+                if (_activeWeapon == weapon)
+                {
+                    _activeWeapon = null;
+
+                    WeaponBase newWeapon = GetWeaponFromBacklog();
+                    if (newWeapon != null)
+                    {
+                        _activeWeapon = newWeapon;
+                        _activeWeapon.StartShooting();
+                    }
+                    RemoveFromBacklog(newWeapon);
+                }
+            }
+        }
+        private void RemoveFromBacklog(WeaponBase weapon)
+		{
+            if (!_weaponBacklog.Contains(weapon))
+                return;
+
+            _weaponBacklog.Remove(weapon);    
+        }
+
+        private void AddToBacklog(WeaponBase weapon)
+		{
+            if (_weaponBacklog.Contains(weapon))
+                return;
+
+            _weaponBacklog.Add(weapon);
+		}
+
+        private WeaponBase GetWeaponFromBacklog()
+        {
+            if (_weaponBacklog.Count > 0)
+            {
+                int backIndex = _weaponBacklog.Count - 1;
+                WeaponBase weapon = _weaponBacklog[backIndex];
+                _weaponBacklog.RemoveAt(backIndex);
+                return weapon;
+            }
+            return null;
+        }
 
 		private void OnTriggerEnter(Collider other)
 		{
             Powerup powerup = other.GetComponent<Powerup>();
-            if (ReferenceEquals(powerup, null))
+            if (powerup == null)
                 return;
             else
             {

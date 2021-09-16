@@ -1,7 +1,4 @@
-using Player;
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
@@ -11,16 +8,14 @@ public abstract class Projectile : MonoBehaviour
 	private Rigidbody _rigidbody;
 	private Renderer _renderer;
 
-	[SerializeField] private AudioClip _hitSound;
-	[SerializeField] private SpawnableSound _spawnableSound;
+	[SerializeField] protected AudioClip _hitSound;
+	[SerializeField] protected SpawnableSound _spawnableSound;
 
 
-	[SerializeField] private float _damage = 5;
-	private float _damageModifier = 1f;
+	[SerializeField] protected float _damage = 5;
+	protected float _damageModifier = 1f;
 
-	public event EventHandler onProjectileDisabled;
-
-	protected Coroutine _timedCoroutine;
+	protected Coroutine _timedCoroutine = null;
 
 	public bool IsActive => gameObject.activeInHierarchy;
 
@@ -43,17 +38,8 @@ public abstract class Projectile : MonoBehaviour
 	}
 	public virtual void Fire(Vector3 direction, Vector3 startVelocity)
 	{
-		//Debug.Log($"{direction}");
-		//_rigidbody.AddForce(direction * _force, ForceMode.Impulse);
 		_rigidbody.velocity = startVelocity + (direction * _force);
-		
 	}
-
-	//private void DestroyBullet(int points)
-	//{
-
-	//	Destroy(gameObject);
-	//}
 
 	protected virtual void DisableObject()
 	{
@@ -62,9 +48,6 @@ public abstract class Projectile : MonoBehaviour
 		if (_timedCoroutine != null)
 			StopCoroutine(_timedCoroutine);
 		gameObject.SetActive(false);
-
-		
-		//EventManager.RaiseOnBulletDisabled(this);
 	}
 
 	protected virtual void OnBecameInvisible()
@@ -78,6 +61,13 @@ public abstract class Projectile : MonoBehaviour
 		_rigidbody = GetComponent<Rigidbody>();
 	}
 
+	protected virtual void OnCollisionEnter(Collision other)
+	{
+		SpawnableSound sound = Instantiate(_spawnableSound.gameObject, transform.position, Quaternion.identity).GetComponent<SpawnableSound>();
+		sound.PlayAndDestroy(_hitSound);
+		DisableObject();
+	}
+
 
 	protected virtual void OnTriggerEnter(Collider other)
 	{
@@ -86,7 +76,7 @@ public abstract class Projectile : MonoBehaviour
 			health = other.GetComponentInParent<IHealth>();
 
 		health?.TakeDamage(_damage * _damageModifier);
-		SpawnableSound sound = Instantiate(_spawnableSound.gameObject).GetComponent<SpawnableSound>();
+		SpawnableSound sound = Instantiate(_spawnableSound.gameObject, transform.position, Quaternion.identity).GetComponent<SpawnableSound>();
 		sound.PlayAndDestroy(_hitSound);
 		DisableObject();
 	}

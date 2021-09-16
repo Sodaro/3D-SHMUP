@@ -1,133 +1,212 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.InputSystem;
-using MyUtilities;
 using TMPro;
-using System;
+using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Users;
 
 namespace Player
 {
-    [RequireComponent(typeof(PlayerMovement))]
+	[RequireComponent(typeof(PlayerMovement))]
     [RequireComponent(typeof(PlayerShooting))]
     public class PlayerController : MonoBehaviour, IHealth
     {
-
-        private bool _moveTutorialComplete = false;
-
-        [SerializeField] CameraMover _cameraMover;
-
-        PlayerInputActions _inputActions;
-        private PlayerInput _playerInput;
+        [SerializeField] private CameraMover _cameraMover;
         [SerializeField] private TMP_Text _hintsText;
+        [SerializeField] private GameObject _hintsParent;
+        [SerializeField] private Healthbar _healthbar;
+        [SerializeField] private AudioClip _coinSound;
+        [SerializeField] private GameObject _menu;
+        [SerializeField] private float _maxHealth = 100;
+
+        private PlayerInputActions _inputActions;
+        private PlayerInput _playerInput;
         private PlayerMovement _playerMovement;
         private PlayerShooting _playerShooting;
+        private AudioSource _audioSource;
 
-        [SerializeField] Healthbar _healthbar;
-        [SerializeField] AudioClip _coinSound;
-        AudioSource _audioSource;
-        
-        private int _totalPoints;
+        private bool _moveTutorialComplete = false;
+        private bool _shootTutorialComplete = false;
+        private bool _isDead = false;
 
-        [SerializeField] GameObject _menu;
-
-        [SerializeField] private float _maxHealth = 100;
         private float _currentHealth;
 
-        bool _isDead = false;
+        
 
+        private const string MOVE_HELP = "Move using:\n{move}";
 
-        private const string MOVE_HELP = "Move with {move}";
-        private const string SHOOT_HELP = "Shoot with {shoot}";
-        //private const string PAUSE_HELP = "Pause the game with {pause}";
+        private const string SHOOT_HELP = "Shoot your plasmagun:\n{shoot}";
+        private const string ROCKET_HELP = "Rockets need 5 seconds to recharge.\nThey can be fired using\n{shoot}";
 
-        //[SerializeField] private IntEvent _totalPointsUpdated;
+        private string currentlyDisplayedTutorial;
+
+        private Action<InputUser, InputUserChange, InputDevice> _controllerChangedDelegate;
 
         private void Awake()
         {
-            _audioSource = GetComponent<AudioSource>();
-            _currentHealth = _maxHealth;
+            _currentHealth  =  _maxHealth;
+
+            _audioSource    = GetComponent<AudioSource>();
             _playerMovement = GetComponent<PlayerMovement>();
             _playerShooting = GetComponent<PlayerShooting>();
+            _playerInput    = GetComponent<PlayerInput>();
+            _inputActions   = new PlayerInputActions();
 
-            _playerInput = GetComponent<PlayerInput>();
+            _controllerChangedDelegate = delegate { ShowTutorial(currentlyDisplayedTutorial); };
 
-            _inputActions = new PlayerInputActions();
+            RegisterHintCallbacks();
 
+            ShowTutorial(MOVE_HELP);
+        }
 
+        private void ShowTutorial(string tutorialText)
+        {
+            if (!_hintsParent.activeInHierarchy)
+                return;
 
-			_inputActions.Player.Fire.canceled   += _playerShooting.OnFire;
-			_inputActions.Player.Fire.started    += _playerShooting.OnFire;
+            string controlScheme = _playerInput.currentControlScheme;
+            if (tutorialText == SHOOT_HELP)
+			{
+                _hintsText.text = SHOOT_HELP.Replace("{shoot}", _inputActions.Player.Fire.GetBindingDisplayString(group: controlScheme));
+                currentlyDisplayedTutorial = SHOOT_HELP;
+            }
+            else if (tutorialText == ROCKET_HELP)
+			{
+                _hintsText.text = ROCKET_HELP.Replace("{shoot}", _inputActions.Player.Rocket.GetBindingDisplayString(group: controlScheme));
+                currentlyDisplayedTutorial = ROCKET_HELP;
+            }
+            else
+			{
+                //keyboard arrows are displayed weirdly so just hard coding this one.
+                if (controlScheme == "Keyboard&Mouse")
+                    _hintsText.text = MOVE_HELP.Replace("{move}", "WASD\nARROW KEYS");
+                else
+                    _hintsText.text = MOVE_HELP.Replace("{move}", _inputActions.Player.Move.GetBindingDisplayString(group: controlScheme));
 
-			_inputActions.Player.Move.canceled   += _playerMovement.OnMove;
-			_inputActions.Player.Move.performed  += _playerMovement.OnMove;
+                currentlyDisplayedTutorial = MOVE_HELP;
 
+            }
+            _hintsText.text = _hintsText.text.Replace(" | ", "\n");
+        }
 
-			_inputActions.Player.Rocket.canceled += _playerShooting.OnFireRocket;
-			_inputActions.Player.Rocket.started  += _playerShooting.OnFireRocket;
-
+        private void RegisterHintCallbacks()
+		{
             _inputActions.Player.Move.performed  += OnMove;
             _inputActions.Player.Fire.started    += OnFire;
-            _inputActions.Player.Pause.performed += OnPause;
+            _inputActions.Player.Rocket.started  += OnRocket;
 
-
-            string controlScheme = _playerInput.currentControlScheme;
-
-            string bindingText = _inputActions.Player.Move.GetBindingDisplayString(group: controlScheme);
-
-            string[] words = bindingText.Split(new string[]{"|"}, StringSplitOptions.RemoveEmptyEntries);
-
-            string controlsText = "";
-			foreach (string word in words)
-			{
-                string trimmedWord = word.Trim();
-                if (trimmedWord.Contains("/"))
-                    continue;
-
-                if (trimmedWord.Length > 1)
-                    controlsText += Environment.NewLine;
-
-                controlsText += trimmedWord;
-            }
-            _hintsText.text = MOVE_HELP.Replace("{move}", "\n"+controlsText);
-
-            //for (int i = 0; i < )
-
-            //_hintsText.text = text;
-            //_playerInput = GetComponent<PlayerInput>();
-
-            //EventManager.onPointsAdded += OnPointsAdded;
+            
+            InputUser.onChange += _controllerChangedDelegate;
         }
-        void OnEnable()
+        private void DeregisterHintCallbacks()
+        {
+            _inputActions.Player.Move.performed  -= OnMove;
+            _inputActions.Player.Fire.started    -= OnFire;
+            _inputActions.Player.Rocket.started  -= OnRocket;
+
+            InputUser.onChange -= _controllerChangedDelegate;
+        }
+
+        private void RegisterCallbacks()
+        {
+            _inputActions.Player.Fire.canceled   += _playerShooting.OnFire;
+            _inputActions.Player.Fire.started    += _playerShooting.OnFire;
+
+            _inputActions.Player.Move.canceled   += _playerMovement.OnMove;
+            _inputActions.Player.Move.performed  += _playerMovement.OnMove;
+
+            _inputActions.Player.Rocket.canceled += _playerShooting.OnFireRocket;
+            _inputActions.Player.Rocket.started  += _playerShooting.OnFireRocket;
+
+
+            _inputActions.Player.Pause.started += OnPause;
+        }
+
+        private void DeregisterCallbacks()
+		{
+            _inputActions.Player.Fire.canceled   -= _playerShooting.OnFire;
+            _inputActions.Player.Fire.started    -= _playerShooting.OnFire;
+
+            _inputActions.Player.Move.canceled   -= _playerMovement.OnMove;
+            _inputActions.Player.Move.performed  -= _playerMovement.OnMove;
+
+            _inputActions.Player.Rocket.canceled -= _playerShooting.OnFireRocket;
+            _inputActions.Player.Rocket.started  -= _playerShooting.OnFireRocket;
+
+            _inputActions.Player.Pause.started -= OnPause;
+        }
+
+        private void EnableInputs()
 		{
             _inputActions.Player.Move.Enable();
-            _inputActions.Player.Fire.Enable();
-            _inputActions.Player.Pause.Enable();
-            _inputActions.Player.Rocket.Enable();
 
+            if (_moveTutorialComplete)
+                _inputActions.Player.Fire.Enable();
+            if (_shootTutorialComplete)
+                _inputActions.Player.Rocket.Enable();
+
+            _inputActions.Player.Pause.Enable();
         }
-        void OnFire(InputAction.CallbackContext context)
+
+        private void DisableInputs()
 		{
-            //Debug.Log($"{_inputActions.controlSchemes}");
-            // int bindingIndex = _inputActions.Player.Pause.GetBindingIndex(InputBinding.MaskByGroup("Gamepad"));
+            _inputActions.Player.Move.Disable();
+            _inputActions.Player.Fire.Disable();
+            _inputActions.Player.Rocket.Disable();
+            _inputActions.Player.Pause.Disable();
+        }
+
+
+        private void OnEnable()
+		{
+            EnableInputs();
+            RegisterCallbacks();
+        }
+        private void OnDisable()
+		{
+            DisableInputs();
+            DeregisterCallbacks();
+            DeregisterHintCallbacks();
+        }
+
+        IEnumerator CallAfterSeconds(float seconds, Action<string> action, string tutorialText)
+		{
+            yield return new WaitForSeconds(seconds);
+            action.Invoke(tutorialText);
+		}
+        private void OnFire(InputAction.CallbackContext context)
+		{
             if (!_moveTutorialComplete)
                 return;
-            _hintsText.gameObject.SetActive(false);
 
-            string controlScheme = _playerInput.currentControlScheme;
-            //_hintsText.text = PAUSE_HELP.Replace("{pause}", _inputActions.Player.Pause.GetBindingDisplayString(group: controlScheme));
-            _inputActions.Player.Fire.performed -= OnFire;
-
+            
+            StartCoroutine(CallAfterSeconds(2, ShowTutorial, ROCKET_HELP));
+            _inputActions.Player.Rocket.Enable();
+            _inputActions.Player.Fire.started -= OnFire;
+           
             EventManager.RaiseOnTutorialFinish();
         }
 
-        void OnMove(InputAction.CallbackContext context)
+        private void OnMove(InputAction.CallbackContext context)
 		{
             _moveTutorialComplete = true;
-            //int bindingIndex = _inputActions.Player.Fire.GetBindingIndex(InputBinding.MaskByGroup("Gamepad"));
-            string controlScheme = _playerInput.currentControlScheme;
-            _hintsText.text = SHOOT_HELP.Replace("{shoot}", _inputActions.Player.Fire.GetBindingDisplayString(group: controlScheme));
+
+            StartCoroutine(CallAfterSeconds(2, ShowTutorial, SHOOT_HELP));
+            _inputActions.Player.Fire.Enable(); 
             _inputActions.Player.Move.performed -= OnMove;
+
+        }
+
+        private void OnRocket(InputAction.CallbackContext context)
+		{
+            if (!_moveTutorialComplete)
+                return;
+
+            _hintsParent.SetActive(false);
+            _inputActions.Player.Rocket.started -= OnRocket;
         }
 
         public void OnPause(InputAction.CallbackContext context)
@@ -135,6 +214,7 @@ namespace Player
             if (_isDead)
                 return;
 
+			Debug.Log($"pause");
             //toggle menu
             EventManager.RaiseOnGamePause(!_menu.activeInHierarchy);
         }
@@ -142,17 +222,11 @@ namespace Player
 		private void OnTriggerEnter(Collider other)
 		{
             Collectible collectible = other.GetComponent<Collectible>();
-            if (ReferenceEquals(collectible, null))
-			{
+            if (collectible == null)
                 return;
-            }
-            else
-			{
-                //OnPointsAdded(collectible.PickUpCollectible());
-                collectible.PickUpCollectible();
-                _audioSource.PlayOneShot(_coinSound);
-                //Debug.Log("points added");
-            }
+
+            collectible.PickUpCollectible();
+            _audioSource.PlayOneShot(_coinSound);
 
         }
 
@@ -161,23 +235,26 @@ namespace Player
             //Show GameOver Screen
             if (collision.gameObject.layer == 0)
 			{
-                //TODO: StartCoroutine and fade before setting dead to true, play explosion sound etc
-
                 _isDead = true;
+                _playerMovement.enabled = false;
+                _playerShooting.enabled = false;
+                DeregisterCallbacks();
                 EventManager.RaiseOnGameOver();
-                //EnableMenu();
 			}
 		}
 
 		public void TakeDamage(float amount)
 		{
+            //play damage sound
             _currentHealth -= amount;
             _healthbar.UpdateHealthFill(_currentHealth, _maxHealth);
             if (_currentHealth <= 0)
             {
                 _isDead = true;
+                _playerMovement.enabled = false;
+                _playerShooting.enabled = false;
+                DeregisterCallbacks();
                 EventManager.RaiseOnGameOver();
-                //EnableMenu();
             }
         }
 

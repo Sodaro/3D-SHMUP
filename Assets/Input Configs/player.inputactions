@@ -303,7 +303,7 @@
                 {
                     "name": "",
                     "id": "f8e7ce8b-5c9a-4a45-bd71-214717beaf42",
-                    "path": "<Keyboard>/q",
+                    "path": "<Keyboard>/leftShift",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
@@ -349,7 +349,7 @@
                 },
                 {
                     "name": "Submit",
-                    "type": "Button",
+                    "type": "PassThrough",
                     "id": "f7152e09-de10-4a3e-a932-4ef2eb73f603",
                     "expectedControlType": "Button",
                     "processors": "",
@@ -687,7 +687,40 @@
                 },
                 {
                     "name": "",
-                    "id": "9e92bb26-7e3b-4ec4-b06b-3c8f8e498ddc",
+                    "id": "4328fc26-2802-4122-b5c1-73c5020f51f1",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Submit",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "7c7bd800-a337-41c4-8a22-605cee479314",
+                    "path": "<Gamepad>/leftTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "Submit",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ba50796a-22b8-4051-8df2-637fc7fd3045",
+                    "path": "<Gamepad>/rightTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "Submit",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c063c19b-4665-4621-92ba-5f927db5fe15",
                     "path": "*/{Submit}",
                     "interactions": "",
                     "processors": "",

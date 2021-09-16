@@ -1,11 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class SpaceRock : MonoBehaviour, IHealth
 {
 	private AudioSource _audioSource;
-	private float _currentHealth = 10f;
+	[SerializeField] private float _currentHealth = 10f;
 	[SerializeField] private int _points = 10;
 
 	private void Awake()

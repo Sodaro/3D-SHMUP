@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
 public class CameraMover : MonoBehaviour
@@ -12,19 +9,23 @@ public class CameraMover : MonoBehaviour
     [SerializeField] private float _rotationSpeed = 1f;
     private Vector3 _velocity = Vector3.zero;
 
-	private void Awake()
+	private void OnEnable()
 	{
         EventManager.onTutorialFinish += StartMoving;
-	}
+    }
 
-    void StartMoving()
+	private void OnDisable()
+	{
+        EventManager.onTutorialFinish -= StartMoving;
+    }
+
+	void StartMoving()
 	{
         _currentWaypoint = _waypoints[_currentTargetIndex];
     }
 
     public Vector3 Velocity => _velocity;
 
-    // Update is called once per frame
     void Update()
     {
         if (_currentWaypoint == null)

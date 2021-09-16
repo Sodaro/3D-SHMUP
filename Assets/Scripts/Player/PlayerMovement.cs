@@ -1,15 +1,14 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using TMPro;
 
 namespace Player
 {
-    public class PlayerMovement : MonoBehaviour
+	public class PlayerMovement : MonoBehaviour
     {
-        
-        [SerializeField] private bool _isRotationInverted = false;
+        /// <summary>
+        /// Handles the movement logic of the player.
+        /// </summary>
+
         [SerializeField] private float _rotationSpeed = 60f;
         [SerializeField] private float _moveSpeed = 10f;
 
@@ -31,7 +30,7 @@ namespace Player
             Quaternion rotation1, rotation2, targetRotation;
             rotation1 = rotation2 = targetRotation = Quaternion.identity;
 
-            //get angles in range -180 - 180
+            //get angles in range ((-180) - 180)
             if (angles.z > 180)
                 angles.z -= 360;
 
@@ -64,7 +63,7 @@ namespace Player
 
         public void OnMove(InputAction.CallbackContext context)
         {
-            _moveDirection = context.ReadValue<Vector2>();
+            _moveDirection = context.ReadValue<Vector2>().normalized;
             _moveVelocity = _moveDirection * _moveSpeed;
         }
 
@@ -75,22 +74,19 @@ namespace Player
             if (_moveVelocity == Vector3.zero)
             {
                 //reset rotation to parent rotation
-                transform.rotation = Quaternion.RotateTowards(transform.rotation, transform.parent.rotation, _rotationSpeed * Time.deltaTime);
-            }
-            else
-            {
-
-                Quaternion targetRotation = GetTargetRotation(_moveDirection.x, _moveDirection.y);
-                if (targetRotation != Quaternion.identity)
-                    transform.localRotation = Quaternion.RotateTowards(transform.localRotation, targetRotation, _rotationSpeed * Time.deltaTime);
-
-                localPos += _moveVelocity * Time.deltaTime;
-                localPos.x = Mathf.Clamp(localPos.x, PLAYER_MIN_X_POS, PLAYER_MAX_X_POS);
-                localPos.y = Mathf.Clamp(localPos.y, PLAYER_MIN_Y_POS, PLAYER_MAX_Y_POS);
-
-                transform.localPosition = localPos;
+                transform.rotation = Quaternion.Slerp(transform.rotation, transform.parent.rotation, _rotationSpeed * Time.deltaTime);
+                return;
             }
 
+            Quaternion targetRotation = GetTargetRotation(_moveDirection.x, _moveDirection.y);
+            if (targetRotation != Quaternion.identity)
+                transform.localRotation = Quaternion.RotateTowards(transform.localRotation, targetRotation, _rotationSpeed * Time.deltaTime);
+
+            localPos += _moveVelocity * Time.deltaTime;
+            localPos.x = Mathf.Clamp(localPos.x, PLAYER_MIN_X_POS, PLAYER_MAX_X_POS);
+            localPos.y = Mathf.Clamp(localPos.y, PLAYER_MIN_Y_POS, PLAYER_MAX_Y_POS);
+
+            transform.localPosition = localPos;
         }
     }
 	//  }

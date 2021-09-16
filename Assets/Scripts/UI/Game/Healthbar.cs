@@ -13,11 +13,6 @@ public class Healthbar : MonoBehaviour
         healthImage.fillMethod = Image.FillMethod.Horizontal;
         healthImage.fillOrigin = (int)Image.OriginHorizontal.Left;
 	}
-	// Start is called before the first frame update
-	void Start()
-    {
-        //healthImage.fillAmount = 0.25f;
-    }
 
     public void UpdateHealthFill(float currentAmount, float maxAmount)
 	{

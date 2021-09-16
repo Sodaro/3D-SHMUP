@@ -1,15 +1,18 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class EventManager : MonoBehaviour
 {
+    //Made with help using https://www.gamedeveloper.com/business/how-to-use-c-events-in-unity
+
+
+    /// <summary>
+    /// This class declares several events and delegates, and functions for raising these events.
+    /// Use case: The scorehandler subscribes to onPointsAdded event, when an enemy is destroyed it calls RaiseOnPointsAdded(points),
+    /// which the scorehandler then adds to the UI without being coupled to the enemy.
+    /// </summary>
 
     public delegate void OnPointsAdded(int amount);
     public static event OnPointsAdded onPointsAdded;
-
-    //public delegate void OnProjectileDisabled(Projectile projectile);
-    //public static event OnProjectileDisabled onProjectileDisabled;
 
     public delegate void OnGameOver();
     public static event OnGameOver onGameOver;
@@ -25,12 +28,6 @@ public class EventManager : MonoBehaviour
         if (onPointsAdded != null)
             onPointsAdded(amount);
 	}
-
-    //public static void RaiseOnBulletDisabled(Projectile bullet)
-    //{
-    //    if (onProjectileDisabled != null)
-    //        onProjectileDisabled(bullet);
-    //}
 
     public static void RaiseOnGameOver()
 	{

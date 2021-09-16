@@ -1,7 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
 public class HuntingState : State
 {
 	public HuntingState(Enemy enemy, StateMachine stateMachine) : base(enemy, stateMachine)
@@ -10,15 +6,12 @@ public class HuntingState : State
 
 	public override void Enter()
 	{
-		//Debug.Log($"State entered: {this}");
 		base.Enter();
 		_enemy.StartShooting();
-		//_stateMachine.ChangeState(new DormantState(_enemy, _stateMachine));
 	}
 
 	public override void Exit()
 	{
-		//Debug.Log($"State exited: {this}");
 		base.Exit();
 	}
 

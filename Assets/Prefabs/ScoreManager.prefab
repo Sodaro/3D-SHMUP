@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6746869679080704576}
   - component: {fileID: 6746869679080704577}
-  m_Layer: 12
+  m_Layer: 11
   m_Name: ScoreManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
