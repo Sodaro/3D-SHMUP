@@ -1,0 +1,151 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7091614568439473684
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7091614568439473673}
+  - component: {fileID: 7091614568439473674}
+  m_Layer: 6
+  m_Name: ShipCamera
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7091614568439473673
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7091614568439473684}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 22.1, y: 0, z: -46.59}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 1338935651721692997}
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!20 &7091614568439473674
+Camera:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7091614568439473684}
+  m_Enabled: 1
+  serializedVersion: 2
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
+  m_projectionMatrixMode: 1
+  m_GateFitMode: 2
+  m_FOVAxisMode: 0
+  m_SensorSize: {x: 36, y: 24}
+  m_LensShift: {x: 0, y: 0}
+  m_FocalLength: 50
+  m_NormalizedViewPortRect:
+    serializedVersion: 2
+    x: 0.5
+    y: 0.5
+    width: 0.5
+    height: 0.5
+  near clip plane: 0.3
+  far clip plane: 1000
+  field of view: 90
+  orthographic: 0
+  orthographic size: 5
+  m_Depth: 1
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 64
+  m_RenderingPath: -1
+  m_TargetTexture: {fileID: 0}
+  m_TargetDisplay: 0
+  m_TargetEye: 3
+  m_HDR: 1
+  m_AllowMSAA: 1
+  m_AllowDynamicResolution: 0
+  m_ForceIntoRT: 0
+  m_OcclusionCulling: 1
+  m_StereoConvergence: 10
+  m_StereoSeparation: 0.022
+--- !u!1001 &7091614570398875575
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 7091614568439473673}
+    m_Modifications:
+    - target: {fileID: 249461545090853400, guid: fecad54dc20262e42bf8a9cf6541fa77, type: 3}
+      propertyPath: m_Name
+      value: ship
+      objectReference: {fileID: 0}
+    - target: {fileID: 249461545090853400, guid: fecad54dc20262e42bf8a9cf6541fa77, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 1184827252736473367, guid: fecad54dc20262e42bf8a9cf6541fa77, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3757233528783481821, guid: fecad54dc20262e42bf8a9cf6541fa77, type: 3}
+      propertyPath: m_Materials.Array.data[3]
+      value: 
+      objectReference: {fileID: 8992934318045909824, guid: b52a63112ff629f4a89a9239c98d81fc, type: 3}
+    - target: {fileID: 8142124402656524530, guid: fecad54dc20262e42bf8a9cf6541fa77, type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8142124402656524530, guid: fecad54dc20262e42bf8a9cf6541fa77, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.09
+      objectReference: {fileID: 0}
+    - target: {fileID: 8142124402656524530, guid: fecad54dc20262e42bf8a9cf6541fa77, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.24
+      objectReference: {fileID: 0}
+    - target: {fileID: 8142124402656524530, guid: fecad54dc20262e42bf8a9cf6541fa77, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 3.36
+      objectReference: {fileID: 0}
+    - target: {fileID: 8142124402656524530, guid: fecad54dc20262e42bf8a9cf6541fa77, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.5844174
+      objectReference: {fileID: 0}
+    - target: {fileID: 8142124402656524530, guid: fecad54dc20262e42bf8a9cf6541fa77, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.46520877
+      objectReference: {fileID: 0}
+    - target: {fileID: 8142124402656524530, guid: fecad54dc20262e42bf8a9cf6541fa77, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.6359899
+      objectReference: {fileID: 0}
+    - target: {fileID: 8142124402656524530, guid: fecad54dc20262e42bf8a9cf6541fa77, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.19378848
+      objectReference: {fileID: 0}
+    - target: {fileID: 8142124402656524530, guid: fecad54dc20262e42bf8a9cf6541fa77, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -17.293
+      objectReference: {fileID: 0}
+    - target: {fileID: 8142124402656524530, guid: fecad54dc20262e42bf8a9cf6541fa77, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -104.67
+      objectReference: {fileID: 0}
+    - target: {fileID: 8142124402656524530, guid: fecad54dc20262e42bf8a9cf6541fa77, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 58.979
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: fecad54dc20262e42bf8a9cf6541fa77, type: 3}
+--- !u!4 &1338935651721692997 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8142124402656524530, guid: fecad54dc20262e42bf8a9cf6541fa77, type: 3}
+  m_PrefabInstance: {fileID: 7091614570398875575}
+  m_PrefabAsset: {fileID: 0}
